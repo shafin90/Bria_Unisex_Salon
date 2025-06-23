@@ -6,7 +6,7 @@ const confirmationMessage = async (name, phoneNumber) => {
     try {
         // initialize Date
         const date = new Date();
-        console.log("keep trying------------------------------------------------------")
+        // console.log("keep trying------------------------------------------------------")
 
         // Formatting the date
         const day = String(date.getDate()).padStart(2, '0');
@@ -55,7 +55,7 @@ const confirmationMessage = async (name, phoneNumber) => {
         });
 
         const data = await response.json();
-        console.log('Message sent: ---------------------------------------------', data);
+        // console.log('Message sent: ---------------------------------------------', data);
 
     } catch (error) {
         res.json({ success: false, error })
@@ -92,7 +92,7 @@ const reminderFunctionForToday = async (name, phoneNumber) => {
         });
 
         const data = await response.json();
-        console.log('Message sent:', data);
+        // console.log('Message sent:', data);
     } catch (error) {
         console.error('Error sending message:', error);
     }
@@ -151,7 +151,7 @@ const reminderFunctionBeforeOneHour = async (name, phoneNumber) => {
         });
 
         const data = await response.json();
-        console.log('Message sent:', data);
+        // console.log('Message sent:', data);
     } catch (error) {
         console.error('Error sending message:', error);
     }

@@ -7,9 +7,19 @@ const Service = require('../model/serviceSchema');
 const storage = multer.diskStorage({
     destination: './uploads/',
     filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
+        const timestamp = Date.now();
+        const ext = path.extname(file.originalname).toLowerCase();
+        
+        // Remove extension to process base name safely
+        const baseName = path.basename(file.originalname.split(" ")[0], ext)
+            .replace(/\s+/g, '_')      // Replace spaces with underscores
+            .replace(/[^a-zA-Z0-9_-]/g, '')  // Remove unsafe characters
+            .toLowerCase();            // Optional: make filename lowercase
+
+        cb(null, `${timestamp}-${baseName}${ext}`);
     }
 });
+
 
 
 
@@ -39,9 +49,11 @@ const serviceController = {
             }
             try {
                 const { serviceName, serviceDescription, price, category, serviceType } = req.body;
+                console.log(1)
                 const img = req.file ? req.file.filename : '';
-                const imgUrl = req.file ? `https://bria-unisex-salon-server.onrender.com/uploads/${img}` : '';
-
+                console.log(2)
+                const imgUrl = req.file ? `http://localhost:8000/uploads/${img}` : '';
+                console.log(3)
                 const newService = new Service({
                     serviceName,
                     serviceDescription,
@@ -50,12 +62,13 @@ const serviceController = {
                     category,
                     serviceType
                 });
-
+                console.log(4)
                 const addedNewService = await newService.save();
-
+                console.log(5)
                 if (!addedNewService) {
                     return res.json({ errorMessage: "Something went wrong" });
                 }
+                console.log(6)
                 res.json({ message: "Service added", success: true });
             } catch (error) {
                 res.json({ errorMessage: "Something went wrong", error });
@@ -124,7 +137,7 @@ const serviceController = {
                 const { id } = req.params;
                 const { serviceName, serviceDescription, price, category, serviceType } = req.body;
                 const img = req.file ? req.file.filename : '';
-                const imgUrl = req.file ? `https://bria-unisex-salon-server.onrender.com/uploads/${img}` : '';
+                const imgUrl = req.file ? `http://localhost:8000/uploads/${img}` : '';
 
                 const updatedFields = { serviceName, serviceDescription, price, category, serviceType };
                 if (img) updatedFields.img = imgUrl;

@@ -15,7 +15,7 @@ function formatDate(date) {
     const year = date.getFullYear();
     return `${year}-${month}-${day}`;
 }
-console.log(1)
+// console.log(1)
 function formatTime(date) {
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -29,12 +29,12 @@ const bookingController = {
             const { name, phoneNumber, service, date, time } = req.body;
 
             // verifying all the field's existence
-            if (!(name && phoneNumber && service && date && time)) {
+            if (!name || !phoneNumber || !service || !date || !time) {
                 return res.json({ message: "Please fill up all the fields" });
             }
             const bookingTimeSlice = time[0] == 0 ? time.substring(1) : time;
 
-            console.log("This is date ----------------------------------------------", date)
+            // console.log("This is date ----------------------------------------------", date)
 
             const confirmationCode = uid(6);
             const booking = new Booking({ name, phoneNumber: phoneNumber.slice(1), service, date, time: bookingTimeSlice, confirmationCode });

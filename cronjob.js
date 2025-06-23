@@ -7,11 +7,11 @@ let lastReminderDate = null; // Variable to store the last sent reminder date
 
 const scheduleReminder = async () => {
     try {
-        console.log('Cron job started at:', new Date().toISOString());
+        // console.log('Cron job started at:', new Date().toISOString());
         const now = new Date();
         const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
 
-        console.log(formatDate(oneHourLater), formatTimeWithAmPm(oneHourLater).toLocaleLowerCase());
+        // console.log(formatDate(oneHourLater), formatTimeWithAmPm(oneHourLater).toLocaleLowerCase());
 
         const date = formatDate(oneHourLater);
         const time = formatTimeWithAmPm(oneHourLater);
@@ -19,13 +19,13 @@ const scheduleReminder = async () => {
         const minutesAmPm = rest.trim();
         const regexTime = `${hours}:${minutesAmPm}`; // Case insensitive match for AM/PM
 
-        console.log("This is date and time-----------------", date, regexTime.toLocaleLowerCase())
+        // console.log("This is date and time-----------------", date, regexTime.toLocaleLowerCase())
         const appointments = await Booking.find({ date: date, time: regexTime.toLocaleLowerCase() });
 
-        console.log(appointments)
+        // console.log(appointments)
 
         for (const appointment of appointments) {
-            console.log('Sending WhatsApp message to:', appointment.phoneNumber);
+            // console.log('Sending WhatsApp message to:', appointment.phoneNumber);
             await reminderFunctionBeforeOneHour(appointment.name, appointment.phoneNumber)
         }
 
@@ -45,7 +45,7 @@ const scheduleReminder = async () => {
             for (const phoneNumber of usersToRemind) {
                 const userAppointments = appointmentsToday.find(appointment => appointment.phoneNumber === phoneNumber);
                 if (userAppointments) {
-                    console.log('Scheduling 7:00 AM reminder for:', phoneNumber);
+                    // console.log('Scheduling 7:00 AM reminder for:', phoneNumber);
                     await reminderFunctionForToday(userAppointments.name, phoneNumber);
                 }
             }
@@ -54,7 +54,7 @@ const scheduleReminder = async () => {
         }
 
     } catch (error) {
-        console.error('Error in scheduleReminder:', error);
+        // console.error('Error in scheduleReminder:', error);
     }
 };
 

@@ -57,7 +57,7 @@ const dashboardController = {
 
 
             for (const iterator of serviceListOfLastThirtyDays) {
-                console.log(iterator)
+                // console.log(iterator)
                 lastThirtyDaysRevenue = lastThirtyDaysRevenue + iterator.servicePrice;
             }
 

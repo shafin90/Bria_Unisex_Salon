@@ -19,23 +19,26 @@ const option = {
 
 
 // Load SSL certificate
-const sslCA = fs.readFileSync(path.join(__dirname, 'global-bundle.pem'));
+const caFilePath = path.join(__dirname, 'global-bundle.pem');
 
 // MongoDB connection string
-const mongodbConnectionString = `mongodb://bria:12345678@briaunisexsalon.cluster-cj8kwaosypww.ap-south-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=global-bundle.pem&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
+const mongodbConnectionString = `mongodb+srv://shafin:shafin@cluster0.yfo5lts.mongodb.net/briaUnisexSalun?retryWrites=true&w=majority&appName=Cluster0`;
 
 // MongoDB connection options
 const options = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true,
+    // tls: true,
+    // tlsCAFile: caFilePath,
+    // replicaSet: 'rs0',
+    // readPreference: 'secondaryPreferred',
+    // retryWrites: false,
+    // serverSelectionTimeoutMS: 60000,
+    // socketTimeoutMS: 60000,
     tls: true,
-    tlsCAFile: sslCA,
-    replicaSet: 'rs0',
-    readPreference: 'secondaryPreferred',
-    retryWrites: false,
-    serverSelectionTimeoutMS: 60000, // Increase this to a higher value
-    socketTimeoutMS: 60000,        // Increase this to a higher value
+    tlsAllowInvalidCertificates: true,
 };
+
 
 // Connect to MongoDB with retry logic
 const connectWithRetry = () => {
@@ -57,7 +60,7 @@ db.once('open', function () {
     console.log('Connected to MongoDB');
 
     // Schedule the cron job to run every 5 minutes after MongoDB is connected
-    cron.schedule('* * * * *', scheduleReminder);
+    // cron.schedule('* * * * *', scheduleReminder);
 });
 
 // CORS options
