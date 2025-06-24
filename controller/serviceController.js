@@ -2,42 +2,32 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const Service = require('../model/serviceSchema');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
-// Set up multer for file storage
-const storage = multer.diskStorage({
-    destination: './uploads/',
-    filename: (req, file, cb) => {
-        const timestamp = Date.now();
-        const ext = path.extname(file.originalname).toLowerCase();
-        
-        // Remove extension to process base name safely
-        const baseName = path.basename(file.originalname.split(" ")[0], ext)
-            .replace(/\s+/g, '_')      // Replace spaces with underscores
-            .replace(/[^a-zA-Z0-9_-]/g, '')  // Remove unsafe characters
-            .toLowerCase();            // Optional: make filename lowercase
 
-        cb(null, `${timestamp}-${baseName}${ext}`);
-    }
+cloudinary.config({
+    cloud_name: 'drjlwkesp',
+    api_key: '424161371495428',
+    api_secret: 'QnfSUs909OsnbJWJbq2bmfIi61k'
 });
 
-
-
-
+// Set up multer for file storage
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'services', // Cloudinary folder where images will be stored
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
+        transformation: [{ width: 500, height: 500, crop: 'limit' }] // Optional: Resize or transform images
+    }
+});
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 1000000 }, // Limit file size to 1MB
-    fileFilter: (req, file, cb) => {
-        const filetypes = /jpeg|jpg|png|gif/;
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = filetypes.test(file.mimetype);
-
-        if (mimetype && extname) {
-            return cb(null, true);
-        } else {
-            cb('Error: Images Only!');
-        }
-    }
+    limits: { fileSize: 1000000 } // 1MB file size limit
 }).single('img');
+
+
+
 
 
 
@@ -50,10 +40,8 @@ const serviceController = {
             try {
                 const { serviceName, serviceDescription, price, category, serviceType } = req.body;
                 console.log(1)
-                const img = req.file ? req.file.filename : '';
-                console.log(2)
-                const imgUrl = req.file ? `http://localhost:8000/uploads/${img}` : '';
-                console.log(3)
+                const imgUrl = req.file ? req.file.path : '';
+
                 const newService = new Service({
                     serviceName,
                     serviceDescription,
@@ -136,11 +124,10 @@ const serviceController = {
             try {
                 const { id } = req.params;
                 const { serviceName, serviceDescription, price, category, serviceType } = req.body;
-                const img = req.file ? req.file.filename : '';
-                const imgUrl = req.file ? `http://localhost:8000/uploads/${img}` : '';
-
+                const imgUrl = req.file ? req.file.path : '';
                 const updatedFields = { serviceName, serviceDescription, price, category, serviceType };
-                if (img) updatedFields.img = imgUrl;
+                if (imgUrl) updatedFields.img = imgUrl;
+
 
                 const edited = await Service.findByIdAndUpdate(id, updatedFields, { new: true });
 
