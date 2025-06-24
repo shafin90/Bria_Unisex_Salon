@@ -40,6 +40,7 @@ const serviceController = {
             try {
                 const { serviceName, serviceDescription, price, category, serviceType } = req.body;
                 console.log(1)
+                console.log(1)
                 const imgUrl = req.file ? req.file.path : '';
 
                 const newService = new Service({
