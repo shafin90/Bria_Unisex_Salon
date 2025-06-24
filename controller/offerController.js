@@ -1,33 +1,28 @@
 const Offer = require("../model/offerSchema");
 const multer = require('multer');
-const path = require('path');
-const express = require('express');
-const app = express();
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
 
-// Set up multer for file storage
-const storage = multer.diskStorage({
-    destination: './uploads/',
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}${path.extname(file.originalname)}`);
+// Cloudinary Config
+cloudinary.config({
+    cloud_name: 'drjlwkesp',
+    api_key: '424161371495428',
+    api_secret: 'QnfSUs909OsnbJWJbq2bmfIi61k'
+});
+// Set up Cloudinary Storage for Multer
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'offers',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
+        transformation: [{ width: 500, height: 500, crop: 'limit' }]
     }
 });
 
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 1000000 }, // Limit file size to 1MB
-    fileFilter: (req, file, cb) => {
-        const filetypes = /jpeg|jpg|png|gif/;
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        const mimetype = filetypes.test(file.mimetype);
-
-        if (mimetype && extname) {
-            return cb(null, true);
-        } else {
-            cb('Error: Images Only!');
-        }
-    }
+    limits: { fileSize: 1000000 } // 1MB limit
 }).single('offerImg');
-
 
 const offerController = {
     addOffer: async (req, res) => {
@@ -37,8 +32,7 @@ const offerController = {
             }
             try {
                 const { offerName, startDate, endDate, usageLimit } = req.body;
-                const offerImg = req.file ? req.file.filename : '';
-                const offerImgUrl = req.file ? `https://bria-server.vercel.app/uploads/${offerImg}` : '';
+                const offerImgUrl = req.file ? req.file.path : '';
 
                 const newOffer = new Offer({
                     offerName,
@@ -49,7 +43,6 @@ const offerController = {
                 });
 
                 const addedOffer = await newOffer.save();
-
                 if (!addedOffer) {
                     return res.json({ errorMessage: "Something went wrong" });
                 }
@@ -59,6 +52,7 @@ const offerController = {
             }
         });
     },
+
     getAllOffer: async (req, res) => {
         try {
             const allOffer = await Offer.find();
@@ -67,6 +61,7 @@ const offerController = {
             res.json({ errorMessage: "Something went wrong", error });
         }
     },
+
     getAllActiveOffer: async (req, res) => {
         try {
             const allOffer = await Offer.find();
@@ -76,6 +71,7 @@ const offerController = {
             res.json({ errorMessage: "Something went wrong", error });
         }
     },
+
     getAllInactiveOffer: async (req, res) => {
         try {
             const allOffer = await Offer.find();
@@ -85,6 +81,7 @@ const offerController = {
             res.json({ errorMessage: "Something went wrong", error });
         }
     },
+
     getParticularOfferById: async (req, res) => {
         try {
             const { id } = req.params;
@@ -97,6 +94,7 @@ const offerController = {
             res.json({ errorMessage: "Something went wrong", error });
         }
     },
+
     editOffer: async (req, res) => {
         upload(req, res, async (err) => {
             if (err) {
@@ -105,11 +103,10 @@ const offerController = {
             try {
                 const { id } = req.params;
                 const { offerName, startDate, endDate, usageLimit, status } = req.body;
-                const offerImg = req.file ? req.file.filename : '';
-                const offerImgUrl = req.file ? `https://bria-server.vercel.app/uploads/${offerImg}` : '';
+                const offerImgUrl = req.file ? req.file.path : '';
 
                 const updatedFields = { offerName, startDate, endDate, usageLimit, status };
-                if (offerImg) updatedFields.offerImg = offerImgUrl;
+                if (offerImgUrl) updatedFields.offerImg = offerImgUrl;
 
                 const editedOffer = await Offer.findByIdAndUpdate(id, updatedFields, { new: true });
 
