@@ -94,6 +94,7 @@ const service = require("./router/service");
 const user = require("./router/user");
 const dashboard = require("./router/dashboard");
 const adminLogin = require("./router/admin");
+const review = require("./router/review");
 
 // Use routes
 app.use("/user", user);
@@ -102,6 +103,7 @@ app.use("/offer", offer);
 app.use("/booking", booking);
 app.use("/dashboard", dashboard);
 app.use("/adminLogin", adminLogin);
+app.use("/review", review);
 
 // Home route
 app.get("/", async (req, res) => {

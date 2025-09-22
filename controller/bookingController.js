@@ -8,6 +8,9 @@ const User = require("../model/userSchema");
 const Service = require("../model/serviceSchema");
 const { confirmationMessage } = require("../utils/bookingUtilities");
 
+// PDF imports
+const { generateBookingTicket } = require("../utils/pdfGenerator");
+
 
 function formatDate(date) {
     const day = String(date.getDate()).padStart(2, '0');
@@ -138,6 +141,42 @@ const bookingController = {
             res.json({ success: true, getParticularBooking: d })
         } catch (error) {
             res.json({ success: false })
+        }
+    },
+
+    // Generate PDF ticket for booking
+    generateTicket: async (req, res) => {
+        try {
+            const { bookingId } = req.params;
+            
+            // Find the booking
+            const booking = await Booking.findById(bookingId);
+            
+            if (!booking) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Booking not found"
+                });
+            }
+            
+            // Generate PDF ticket
+            const pdfBuffer = await generateBookingTicket(booking);
+            
+            // Set response headers for PDF download
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename="booking-ticket-${booking.confirmationCode}.pdf"`);
+            res.setHeader('Content-Length', pdfBuffer.length);
+            
+            // Send PDF
+            res.send(pdfBuffer);
+            
+        } catch (error) {
+            console.error('Error generating PDF ticket:', error);
+            res.status(500).json({
+                success: false,
+                message: "Failed to generate ticket",
+                error: error.message
+            });
         }
     }
 };

@@ -8,6 +8,7 @@ router.post("/addBooking", bookingController.addBooking)
 router.get("/getAllBooking", bookingController.getAllBooking);
 router.get("/getRecentBooking", bookingController.getRecentBooking);
 router.get("/getParticularBooking/:phoneNumber", bookingController.getParticularBooking)
+router.get("/generateTicket/:bookingId", bookingController.generateTicket)
 
 
 module.exports = router;
