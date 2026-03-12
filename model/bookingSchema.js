@@ -29,7 +29,12 @@ const bookingSchema = mongoose.Schema({
     confirmationCode: {
         type: String
     },
+    stylistId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Stylist'
+    },
     reminderMessageSend: Boolean
+
 })
 
 const Booking = new mongoose.model("Booking", bookingSchema);

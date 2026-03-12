@@ -1,6 +1,6 @@
 const { uid } = require("uid");
 const fetch = require('node-fetch');
-const cron = require('node-cron');
+
 
 // requiring Model
 const Booking = require("../model/bookingSchema");
@@ -10,6 +10,8 @@ const { confirmationMessage } = require("../utils/bookingUtilities");
 
 // PDF imports
 const { generateBookingTicket } = require("../utils/pdfGenerator");
+const { sendBookingConfirmationEmail } = require("../utils/emailService");
+
 
 
 function formatDate(date) {
@@ -29,7 +31,8 @@ function formatTime(date) {
 const bookingController = {
     addBooking: async (req, res) => {
         try {
-            const { name, phoneNumber, service, date, time } = req.body;
+            const { name, phoneNumber, service, date, time, email } = req.body;
+
 
             // verifying all the field's existence
             if (!name || !phoneNumber || !service || !date || !time) {
@@ -83,11 +86,18 @@ const bookingController = {
                 await User.findOneAndUpdate({ name, phoneNumber }, { isRepeat: true }, { new: true });
             }
 
+            // Generate PDF Ticket
+            const pdfBuffer = await generateBookingTicket(bookingAdded);
 
-            confirmationMessage(name, phoneNumber)
+            // Send Email with PDF Token
+            if (email) {
+                await sendBookingConfirmationEmail(email, name, bookingAdded, pdfBuffer);
+            }
+
             res.json({ message: "Booking confirmed", success: true, bookingAdded });
 
         } catch (error) {
+
             console.error('Error in addBooking:', error);
             res.json({ errorMessage: "Something went wrong", error: error.message });
         }

@@ -6,9 +6,13 @@ const cors = require('cors');
 const app = express();
 const https = require('https');
 const path = require('path');
-const cron = require('node-cron');
 const fs = require('fs');
+
 const port = process.env.PORT || 8000;
+const http = require('http');
+const { setupSocket } = require('./utils/socketHandler');
+
+
 
 
 // SSL options
@@ -85,7 +89,8 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // Schedule Reminder Job
-const { scheduleReminder } = require("./cronjob");
+// const { scheduleReminder } = require("./cronjob"); -- REMOVED
+
 
 // Routes
 const booking = require("./router/booking");
@@ -95,6 +100,15 @@ const user = require("./router/user");
 const dashboard = require("./router/dashboard");
 const adminLogin = require("./router/admin");
 const review = require("./router/review");
+const chat = require("./router/chat");
+const stylist = require("./router/stylist");
+const packageRouter = require("./router/package");
+const inventory = require("./router/inventory");
+const portfolio = require("./router/portfolio");
+const waitlist = require("./router/waitlist");
+const payment = require("./router/payment");
+
+
 
 // Use routes
 app.use("/user", user);
@@ -104,6 +118,15 @@ app.use("/booking", booking);
 app.use("/dashboard", dashboard);
 app.use("/adminLogin", adminLogin);
 app.use("/review", review);
+app.use("/chat", chat);
+app.use("/stylist", stylist);
+app.use("/package", packageRouter);
+app.use("/inventory", inventory);
+app.use("/portfolio", portfolio);
+app.use("/waitlist", waitlist);
+app.use("/payment", payment);
+
+
 
 // Home route
 app.get("/", async (req, res) => {
@@ -121,9 +144,13 @@ app.use(function (err, req, res, next) {
 });
 
 // Start server
-app.listen(port, function () {
+const server = http.createServer(app);
+setupSocket(server);
+
+server.listen(port, function () {
     console.log(`CORS-enabled web server listening on port ${port}`);
 });
+
 // https.createServer(option, app).listen(port, () => {
 //     console.log(`Server is running on https://localhost:${port}`);
 // });

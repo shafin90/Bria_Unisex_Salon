@@ -7,8 +7,18 @@ const adminSchema =  mongoose.Schema({
     },
     password:{
         type: String
+    },
+    role: {
+        type: String,
+        enum: ['Owner', 'Manager', 'Stylist'],
+        default: 'Owner'
+    },
+    stylistId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Stylist'
     }
 })
+
 
 // creating model
 const Admin = new mongoose.model("Admin", adminSchema);

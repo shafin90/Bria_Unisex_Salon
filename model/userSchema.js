@@ -5,7 +5,11 @@ const userSchema = mongoose.Schema({
     name: {
         type: String
     },
+    email: {
+        type: String
+    },
     phoneNumber: {
+
         type: String
     },
     isRepeat: {
@@ -27,8 +31,21 @@ const userSchema = mongoose.Schema({
         time:{
             type: String
         }
+    },
+    points: {
+        type: Number,
+        default: 0
+    },
+    tier: {
+        type: String,
+        enum: ['Bronze', 'Silver', 'Gold', 'Platinum'],
+        default: 'Bronze'
+    },
+    membershipExpireDate: {
+        type: Date
     }
 })
+
 
 const User = new  mongoose.model("User", userSchema);
 
