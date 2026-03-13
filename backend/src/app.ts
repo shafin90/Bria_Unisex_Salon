@@ -2,6 +2,11 @@ import express  from 'express';
 import cors  from 'cors';
 import path  from 'path';
 const app = express();
+import { context } from './utils/context';
+
+app.use((req, res, next) => {
+    context.run({}, () => next());
+});
 
 // CORS options
 const corsOptions = {
@@ -38,8 +43,12 @@ import offerRoutes  from './modules/offer/offer.routes';
 import dashboardRoutes  from './modules/dashboard/dashboard.routes';
 import stylistRoutes  from './modules/stylist/stylist.routes';
 import paymentRoutes  from './modules/payment/payment.routes';
+import onboardingRoutes from './modules/onboarding/onboarding.routes';
+import platformRoutes from './modules/platform/platform.routes';
 
 // Use Routes
+app.use('/onboarding', onboardingRoutes);
+app.use('/platform', platformRoutes);
 app.use('/admin', authRoutes);
 app.use('/user', userRoutes);
 app.use('/booking', bookingRoutes);

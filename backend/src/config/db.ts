@@ -1,9 +1,30 @@
 import { Sequelize }  from 'sequelize';
 import config  from './env';
+import { getTenantId } from '../utils/context';
 
 export const sequelize = new Sequelize(config.databaseUrl, {
     dialect: "postgres",
     logging: false,
+});
+
+// GLOBAL TENANT ISOLATION HOOKS
+sequelize.addHook('beforeFind', (options: any) => {
+    const tenantId = getTenantId();
+    if (tenantId) {
+        // Automatically inject tenantId into where clause
+        options.where = {
+            ...options.where,
+            tenantId
+        };
+    }
+});
+
+sequelize.addHook('beforeCreate', (instance: any) => {
+    const tenantId = getTenantId();
+    if (tenantId && !instance.tenantId) {
+        // Automatically set tenantId for new records
+        instance.tenantId = tenantId;
+    }
 });
 
 export const connectDB = async () => {

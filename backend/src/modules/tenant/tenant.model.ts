@@ -27,6 +27,23 @@ const Tenant = sequelize.define("Tenant", {
     stripeConnectStatus: {
         type: DataTypes.ENUM('pending', 'active'),
         defaultValue: 'pending'
+    },
+    // Stripe Billing (Platform Subscription)
+    stripeCustomerId: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    subscriptionId: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    subscriptionStatus: {
+        type: DataTypes.STRING,
+        defaultValue: 'none' // 'active', 'past_due', 'canceled', 'none'
+    },
+    planTier: {
+        type: DataTypes.ENUM('basic', 'pro', 'enterprise'),
+        defaultValue: 'basic'
     }
 }, {
     timestamps: true

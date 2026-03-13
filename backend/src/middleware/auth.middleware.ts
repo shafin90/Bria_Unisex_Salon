@@ -1,30 +1,49 @@
 import Admin  from '../modules/auth/auth.model';
+import jwt from 'jsonwebtoken';
+import env from '../config/env';
 
-// Dummy auth middleware for demonstration
-// In a real app, you would verify a JWT token and set req.admin
 const checkRole = (roles) => {
     return async (req, res, next) => {
-        const adminId = req.headers['admin-id']; // Simplified for now
+        const authHeader = req.headers.authorization;
+        const token = authHeader && authHeader.split(' ')[1];
         
-        if (!adminId) {
-            return res.status(401).json({ error: "Unauthorized. Please provide admin-id header." });
+        if (!token) {
+            return res.status(401).json({ error: "Unauthorized. Please provide a valid Bearer token." });
         }
 
         try {
-            const admin = await Admin.findByPk(adminId);
+            const decoded = jwt.verify(token, env.jwtSecret) as any;
+            
+            // Strict Tenant Validation
+            // If the client provides a tenant-id header, it MUST match the token
+            const headerTenantId = req.headers['tenant-id'];
+            if (headerTenantId && headerTenantId !== decoded.tenantId) {
+                return res.status(403).json({ error: "Forbidden. Tenant mismatch." });
+            }
+
+            const admin = await Admin.findByPk(decoded.adminId);
             if (!admin) {
-                return res.status(401).json({ error: "Admin not found." });
+                return res.status(401).json({ error: "Admin not found or account deactivated." });
             }
 
             if (!roles.includes((admin as any).role)) {
                 return res.status(403).json({ error: "Forbidden. Insufficient permissions." });
             }
 
-            (req as any).admin = admin; // Attach admin object for downstream use
-            (req as any).tenantId = (admin as any).tenantId; // Attach tenantId for query scoping
+            (req as any).admin = admin; 
+            (req as any).tenantId = decoded.tenantId; 
+
+            // Populate global context for Sequelize hooks
+            const store = require('../utils/context').context.getStore();
+            if (store) {
+                store.tenantId = decoded.tenantId;
+                store.admin = admin;
+            }
+
             next();
         } catch (error: any) {
-            res.status(500).json({ error: "Auth verification failed." });
+            console.error("Auth Error:", error.message);
+            res.status(401).json({ error: "Invalid or expired token." });
         }
     };
 };

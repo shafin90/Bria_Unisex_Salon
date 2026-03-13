@@ -12,21 +12,26 @@ export const TenantProvider = ({ children }) => {
     // Alternatively, check localStorage or fallback to null (Platform view)
     const initTenant = async () => {
       try {
+        const hostname = window.location.hostname;
         const pathParts = window.location.pathname.split('/');
-        // e.g. /t/test-salon/books
-        let subdomain = null;
         
-        if (pathParts[1] === 't' && pathParts[2]) {
+        let subdomain = null;
+
+        // 1. Try Subdomain Resolution (e.g. salon1.bria.com)
+        const hostParts = hostname.split('.');
+        if (hostParts.length > 2 && hostParts[0] !== 'www') {
+           subdomain = hostParts[0];
+        }
+
+        // 2. Fallback to Path Resolution (e.g. localhost:5173/t/salon1)
+        if (!subdomain && pathParts[1] === 't' && pathParts[2]) {
           subdomain = pathParts[2];
         }
 
         if (subdomain) {
-          // Ideally fetch tenant from backend right here:
-          // const res = await apiClient.get(`/tenant/resolve/${subdomain}`);
-          // For now, we simulate resolving the tenant and setting standard properties
-          
+          // In a real app, you'd fetch the tenant metadata here
           setTenant({
-            id: 'mock-tenant-id-will-be-injected', // We will update API later to resolve properly
+            id: 'mock-tenant-id', // Scoped by axios interceptor using subdomain
             subdomain: subdomain,
             name: subdomain.replace('-', ' ').toUpperCase()
           });

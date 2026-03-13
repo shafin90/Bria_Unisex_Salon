@@ -1,16 +1,34 @@
 import authRepository  from './auth.repository';
 import { uid }  from 'uid';
-import { sendOTPEmail }  from '../../utils/emailService'; // Need to move emailService later
+import { sendOTPEmail }  from '../../utils/emailService'; 
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import env from '../../config/env';
 
-let otpStore = {}; // Temporary in-memory store for OTPs, should be in Redis or DB for production
+let otpStore = {}; 
 
 const authService = {
     login: async (email, password, tenantId) => {
-        const admin = await authRepository.findByEmailAndPassword(email, password, tenantId);
-        if (admin) {
-            // In a real app, generate a JWT token containing admin.id and admin.tenantId here
-            // e.g. return { token: '...', admin: admin }
-            return { success: true, adminId: (admin as any).id, role: (admin as any).role, tenantId: (admin as any).tenantId };
+        const admin = await authRepository.findByEmail(email, tenantId);
+        if (admin && await bcrypt.compare(password, (admin as any).password)) {
+            const token = jwt.sign(
+                { 
+                    adminId: (admin as any).id, 
+                    role: (admin as any).role, 
+                    tenantId: (admin as any).tenantId 
+                },
+                env.jwtSecret,
+                { expiresIn: '1d' }
+            );
+            return { 
+                success: true, 
+                token,
+                admin: {
+                    id: (admin as any).id,
+                    role: (admin as any).role,
+                    tenantId: (admin as any).tenantId
+                }
+            };
         }
         return false;
     },
@@ -19,7 +37,6 @@ const authService = {
         if (!admin) return { success: false, error: "Email doesn't exist" };
 
         const otp = uid(6);
-        // Scoping OTP by tenantId as well to avoid cross-tenant issues with same email
         otpStore[`${tenantId}_${email}`] = otp; 
         await sendOTPEmail(email, otp);
         return { success: true, message: "Please check your email. You will get an OTP" };
@@ -33,10 +50,10 @@ const authService = {
     resetPassword: async (email, newPass, confirmNewPass, tenantId) => {
         if (newPass !== confirmNewPass) return { success: false, error: "Passwords do not match" };
         
-        const passChanged = await authRepository.updatePassword(email, newPass, tenantId);
+        const hashedPassword = await bcrypt.hash(newPass, 10);
+        const passChanged = await authRepository.updatePassword(email, hashedPassword, tenantId);
         if (passChanged) {
             delete otpStore[`${tenantId}_${email}`];
-            console.log(`Password reset for ${email} on tenant ${tenantId}`);
             return { success: true, message: "Password updated" };
         }
         return { success: false, error: "Something went wrong" };
