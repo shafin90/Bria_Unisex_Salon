@@ -55,64 +55,105 @@ export const API_ENDPOINTS = {
   // Auth endpoints
   AUTH: {
     LOGIN: '/adminLogin/adminLogin',
-    LOGOUT: '/adminLogout',
-    PROFILE: '/admin/profile',
+    LOGOUT: '/adminLogout', // Note: backend router/admin.js doesn't have logout, but index.js doesn't show it either. Usually handled by clearing token on client.
+    FORGET_PASS_MAIL: '/adminLogin/submitForgetPassMail',
+    FORGET_PASS_OTP: '/adminLogin/submitForgetPassOTP',
+    RESET_PASS: '/adminLogin/resetPass',
   },
   
   // Services endpoints
   SERVICES: {
-    LIST: '/services',
-    CREATE: '/services',
-    UPDATE: (id) => `/services/${id}`,
-    DELETE: (id) => `/services/${id}`,
+    LIST: '/service/getAllService',
+    TOP: '/service/getTopServices',
+    CREATE: '/service/addService',
+    GET_BY_ID: (id) => `/service/getParticularServiceById/${id}`,
+    UPDATE: (id) => `/service/editService/${id}`,
+    DELETE: (id) => `/service/deleteService/${id}`,
   },
   
   // Bookings endpoints
   BOOKINGS: {
-    LIST: '/bookings',
-    CREATE: '/bookings',
-    UPDATE: (id) => `/bookings/${id}`,
-    DELETE: (id) => `/bookings/${id}`,
-    STATUS: (id) => `/bookings/${id}/status`,
+    LIST: '/booking/getAllBooking',
+    RECENT: '/booking/getRecentBooking',
+    CREATE: '/booking/addBooking',
+    GET_BY_PHONE: (phone) => `/booking/getParticularBooking/${phone}`,
+    GENERATE_TICKET: (id) => `/booking/generateTicket/${id}`,
+    MY_APPOINTMENTS: '/booking/my-appointments',
   },
   
   // Offers endpoints
   OFFERS: {
-    LIST: '/offers',
-    CREATE: '/offers',
-    UPDATE: (id) => `/offers/${id}`,
-    DELETE: (id) => `/offers/${id}`,
+    LIST: '/offer/getAllOffer',
+    ACTIVE: '/offer/getAllActiveOffer',
+    INACTIVE: '/offer/getAllInactiveOffer',
+    CREATE: '/offer/addOffer',
+    GET_BY_ID: (id) => `/offer/getParticularOfferById/${id}`,
+    UPDATE: (id) => `/offer/editOffer/${id}`,
   },
   
   // Reviews endpoints
   REVIEWS: {
-    LIST: '/reviews',
-    CREATE: '/reviews',
-    UPDATE: (id) => `/reviews/${id}`,
-    DELETE: (id) => `/reviews/${id}`,
-    APPROVE: (id) => `/reviews/${id}/approve`,
+    LIST: '/review/getAllReviews',
+    APPROVED: '/review/getApprovedReviews',
+    CREATE: '/review/addReview',
+    APPROVE: (id) => `/review/approveReview/${id}`,
+    DELETE: (id) => `/review/deleteReview/${id}`,
+    STATS: '/review/getReviewStats',
   },
   
   // Users endpoints
   USERS: {
-    LIST: '/users',
-    CREATE: '/users',
-    UPDATE: (id) => `/users/${id}`,
-    DELETE: (id) => `/users/${id}`,
+    LIST: '/user/getFrequentlyUser', // Backend only has this for now
   },
   
   // Dashboard endpoints
   DASHBOARD: {
-    STATS: '/dashboard/stats',
-    RECENT_BOOKINGS: '/dashboard/recent-bookings',
-    RECENT_REVIEWS: '/dashboard/recent-reviews',
+    DATA: '/dashboard/dashboard',
+    GRAPH: '/dashboard/graphData',
+  },
+
+  // Inventory endpoints
+  INVENTORY: {
+    LIST: '/inventory/all',
+    CREATE: '/inventory/add',
+    UPDATE_STOCK: (id) => `/inventory/update-stock/${id}`,
+  },
+
+  // Portfolio endpoints
+  PORTFOLIO: {
+    GALLERY: '/portfolio/gallery',
+    CREATE: '/portfolio/add',
+  },
+
+  // Package endpoints
+  PACKAGES: {
+    ACTIVE: '/package/active',
+    CREATE: '/package/add',
+  },
+
+  // Waitlist endpoints
+  WAITLIST: {
+    JOIN: '/waitlist/join',
+    BY_DATE: (date) => `/waitlist/date/${date}`,
+  },
+
+  // Chat endpoints
+  CHAT: {
+    HISTORY: (u1, u2) => `/chat/history/${u1}/${u2}`,
+  },
+
+  // Stylist endpoints
+  STYLISTS: {
+    LIST: '/stylist/all',
+    CREATE: '/stylist/add',
+    UPDATE: (id) => `/stylist/update/${id}`,
   },
   
-  // Public endpoints
+  // Public endpoints (Note: backend doesn't have a distinct /public prefix in routes, these are usually shared or separate)
   PUBLIC: {
-    SERVICES: '/public/services',
-    BOOK_APPOINTMENT: '/public/book-appointment',
-    SUBMIT_REVIEW: '/public/submit-review',
+    SERVICES: '/service/getAllService',
+    BOOK_APPOINTMENT: '/booking/addBooking',
+    SUBMIT_REVIEW: '/review/addReview',
   }
 };
 

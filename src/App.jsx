@@ -3,25 +3,33 @@ import { useState, useEffect } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-// Public Components
-import PublicLayout from './components/Public/PublicLayout';
-import Home from './pages/Public/Home';
-import BookAppointment from './pages/Public/BookAppointment';
-import SubmitReview from './pages/Public/SubmitReview';
+// Shared Components
+import PublicLayout from './shared/components/Public/PublicLayout';
+import Home from './shared/components/Public/Home';
+import BookAppointment from './shared/components/Public/BookAppointment';
+import SubmitReview from './shared/components/Public/SubmitReview';
 
-// Admin Components
-import Layout from './components/Layout/Layout';
-import Login from './pages/Auth/Login';
-import Dashboard from './pages/Dashboard/Dashboard';
-import Services from './pages/Services/Services';
-import Bookings from './pages/Bookings/Bookings';
-import Offers from './pages/Offers/Offers';
-import Users from './pages/Users/Users';
-import Reviews from './pages/Reviews/Reviews';
+// Shared Layout
+import Layout from './shared/components/Layout/Layout';
 
-// Context
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { CartProvider } from './context/CartContext';
+// Feature Components
+import Login from './features/auth/Login';
+import Dashboard from './features/dashboard/Dashboard';
+import Services from './features/services/Services';
+import Bookings from './features/bookings/Bookings';
+import Offers from './features/offers/Offers';
+import Users from './features/users/Users';
+import Reviews from './features/reviews/Reviews';
+import Inventory from './features/inventory/Inventory';
+import Portfolio from './features/portfolio/Portfolio';
+import Packages from './features/packages/Packages';
+import Waitlist from './features/waitlist/Waitlist';
+import Chat from './features/chat/Chat';
+import Stylists from './features/stylists/Stylists';
+
+// Shared Context
+import { AuthProvider, useAuth } from './shared/context/AuthContext';
+import { CartProvider } from './shared/context/CartContext';
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
@@ -72,6 +80,12 @@ function AppContent() {
                   <Route path="/offers" element={<Offers />} />
                   <Route path="/users" element={<Users />} />
                   <Route path="/reviews" element={<Reviews />} />
+                  <Route path="/inventory" element={<Inventory />} />
+                  <Route path="/portfolio" element={<Portfolio />} />
+                  <Route path="/packages" element={<Packages />} />
+                  <Route path="/waitlist" element={<Waitlist />} />
+                  <Route path="/chat" element={<Chat />} />
+                  <Route path="/stylists" element={<Stylists />} />
                   <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
                 </Routes>
               </Layout>
