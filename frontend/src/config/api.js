@@ -168,7 +168,14 @@ export const API_ENDPOINTS = {
     VERIFY_CONNECT: '/payment/connect/verify'
   },
   
-  // Public endpoints (Note: backend doesn't have a distinct /public prefix in routes, these are usually shared or separate)
+  // Platform endpoints (Super Admin)
+  PLATFORM: {
+    TENANTS: '/platform/tenants',
+    AUDIT_LOGS: '/platform/audit-logs',
+    UPDATE_TENANT_STATUS: (id) => `/platform/tenant/${id}/status`,
+  },
+  
+  // Public endpoints
   PUBLIC: {
     SERVICES: '/service/getAllService',
     BOOK_APPOINTMENT: '/booking/addBooking',

@@ -44,8 +44,15 @@ const Login = () => {
     const result = await login(formData.email, formData.password);
     
     if (result.success) {
-      // Navigate to admin dashboard on successful login
-      navigate('/admin/dashboard');
+      // Role-based redirection
+      if (result.user.role === 'Super Admin') {
+        navigate('/platform/dashboard');
+      } else {
+        // Find salonName from URL or context
+        const pathParts = window.location.pathname.split('/');
+        const salonName = pathParts[2] || 'default'; 
+        navigate(`/t/${salonName}/admin/dashboard`);
+      }
     } else {
       setError(result.error);
     }

@@ -34,12 +34,16 @@ import { TenantProvider, useTenant } from './shared/context/TenantContext';
 
 // Platform View
 import PlatformLanding from './shared/components/Platform/PlatformLanding';
+import PlatformLayout from './shared/components/Layout/PlatformLayout';
+import PlatformOverview from './shared/components/Platform/PlatformOverview';
+import TenantManager from './shared/components/Platform/TenantManager';
+import AuditLogManager from './shared/components/Platform/AuditLogManager';
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
 
 function AppContent() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, user, loading } = useAuth();
   const { tenant, loadingTenant } = useTenant();
 
   if (loading || loadingTenant) {
@@ -50,12 +54,31 @@ function AppContent() {
     );
   }
 
+  const isSuperAdmin = user?.role === 'Super Admin';
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
         <Routes>
           {/* Global Platform Route */}
           <Route path="/" element={<PlatformLanding />} />
+
+          {/* Super Admin Dashboard Routes */}
+          {isAuthenticated && isSuperAdmin ? (
+            <Route path="/platform/*" element={
+              <PlatformLayout>
+                <Routes>
+                  <Route path="/" element={<Navigate to="dashboard" replace />} />
+                  <Route path="dashboard" element={<PlatformOverview />} />
+                  <Route path="tenants" element={<TenantManager />} />
+                  <Route path="audit-logs" element={<AuditLogManager />} />
+                  <Route path="*" element={<Navigate to="dashboard" replace />} />
+                </Routes>
+              </PlatformLayout>
+            } />
+          ) : (
+            <Route path="/platform/*" element={<Navigate to="/" replace />} />
+          )}
 
           {/* Public Routes scoped to Tenant */}
           <Route path="/t/:salonName" element={
