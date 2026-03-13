@@ -1,4 +1,4 @@
-import apiClient, { API_ENDPOINTS } from '../config/api.js';
+import apiClient, { API_ENDPOINTS } from '../../config/api.js';
 
 export const bookingService = {
   // Get all bookings

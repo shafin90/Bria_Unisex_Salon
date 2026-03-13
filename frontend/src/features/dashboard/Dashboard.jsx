@@ -19,10 +19,36 @@ const Dashboard = () => {
     topServices: []
   });
   const [loading, setLoading] = useState(true);
+  const [stripeStatus, setStripeStatus] = useState('active'); // Assume active until checked
 
   useEffect(() => {
     fetchDashboardData();
+    checkStripeStatus();
   }, []);
+
+  const checkStripeStatus = async () => {
+    try {
+      const res = await dashboardService.verifyStripeConnect();
+      if (res && res.status) {
+        setStripeStatus(res.status);
+      }
+    } catch (err) {
+      console.error("Could not verify stripe status:", err);
+    }
+  };
+
+  const handleStripeConnect = async () => {
+    try {
+      const returnUrl = window.location.origin + window.location.pathname;
+      const res = await dashboardService.createStripeConnect(returnUrl, returnUrl);
+      if (res && res.url) {
+        window.location.href = res.url;
+      }
+    } catch (err) {
+      console.error("Failed to generate connect link:", err);
+      alert("Failed to start Stripe Onboarding");
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -96,6 +122,28 @@ const Dashboard = () => {
         <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-500 mt-1">Overview of salon operations and metrics</p>
       </div>
+
+      {/* Stripe Alert Banner */}
+      {stripeStatus === 'pending' && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <AlertCircle className="h-5 w-5 text-yellow-400" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                Your salon is not yet configured to receive payments.
+                <button 
+                  onClick={handleStripeConnect}
+                  className="font-medium underline ml-2 text-yellow-700 hover:text-yellow-600"
+                >
+                  Set up Stripe Connect now.
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

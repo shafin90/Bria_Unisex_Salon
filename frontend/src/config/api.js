@@ -16,13 +16,26 @@ const apiClient = axios.create({
   headers: API_CONFIG.HEADERS,
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token and tenant id
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Attempt to extract tenant from URL if present
+    const pathParts = window.location.pathname.split('/');
+    if (pathParts[1] === 't' && pathParts[2]) {
+      config.headers['tenant-subdomain'] = pathParts[2];
+    }
+    
+    // Fallback reading tenant info directly if stored mapping exists
+    const localTenant = localStorage.getItem('tenantId');
+    if (localTenant) {
+        config.headers['tenant-id'] = localTenant;
+    }
+
     return config;
   },
   (error) => {
@@ -147,6 +160,12 @@ export const API_ENDPOINTS = {
     LIST: '/stylist/all',
     CREATE: '/stylist/add',
     UPDATE: (id) => `/stylist/update/${id}`,
+  },
+  
+  // Payment endpoints
+  PAYMENTS: {
+    CONNECT: '/payment/connect',
+    VERIFY_CONNECT: '/payment/connect/verify'
   },
   
   // Public endpoints (Note: backend doesn't have a distinct /public prefix in routes, these are usually shared or separate)

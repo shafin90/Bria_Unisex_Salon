@@ -19,5 +19,25 @@ export const dashboardService = {
     } catch (error) {
       throw error.response?.data || error.message;
     }
+  },
+
+  // Initiate Stripe Connect
+  createStripeConnect: async (refreshUrl, returnUrl) => {
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.PAYMENTS.CONNECT, { refreshUrl, returnUrl });
+      return response.data; // should contain { url: '...' }
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  // Verify Stripe Connect Status
+  verifyStripeConnect: async () => {
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.PAYMENTS.VERIFY_CONNECT);
+      return response.data; // should contain { status: 'active' | 'pending' }
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
   }
 };
